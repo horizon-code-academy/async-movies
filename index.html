@@ -40,6 +40,15 @@
                 <span class="sr-only" style="margin-inline: 250px">Loading...</span>
             </div>
         </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><button onclick="prev()" class="page-link" >Previous</button></li>
+                <li class="page-item disabled">
+                  <span id="pageNb" class="page-link" aria-disabled="true">Page 1</span>
+                </li>
+                <li class="page-item"><button onclick="next()" class="page-link" >Next</button></li>
+            </ul>
+          </nav>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
