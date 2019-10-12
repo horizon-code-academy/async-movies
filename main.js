@@ -4,19 +4,22 @@ let pagesNb = 0;
 const pageLength = 4;
 let currentPage = 0;
 
-const runderFilm = ({ Title, Year, Runtime, Poster }) => (
+const runderFilm = ({ _id, title, year, runtime, poster }) => (
     `       
        <div class="col-3 pb-3">
                 <div class="card" >
-                    ${Poster ?
-        `<img src="${Poster}" class="card-img-top" alt="...">` :
+                    ${poster ?
+        `<img src="${poster}" class="card-img-top" alt="...">` :
         `<img src="assets/fallback.jpg" class="card-img-top" alt="...">`}
                     <div class="card-body">
-                        <h5 class="card-title">${Title || "Unknown title"}</h5>
+                        <h5 class="card-title">${title || "Unknown title"}</h5>
                         <p class="card-text">
-                            Year: ${Year || "Unknown year"}<br/>
-                            Duration : ${Runtime || "Unknown duration"}.
+                            Year: ${year || "Unknown year"}<br/>
+                            Duration : ${runtime || "Unknown duration"}.
                         </p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-danger" onclick="deleteMovie('${_id}')">Delete</button> 
                     </div>
                 </div>
         </div>
@@ -24,31 +27,39 @@ const runderFilm = ({ Title, Year, Runtime, Poster }) => (
 );
 
 const fetchFilmFromAPI = async () => {
-    const response = await fetch('https://my-json-server.typicode.com/horizon-code-academy/fake-movies-api/movies');
-    const data = await response.json();
-    movies = [...data, ...data, ...data, ...data, ...data, ...data];
-    moviesNb = movies.length;
-    pagesNb = Math.ceil(moviesNb / pageLength);
+    const response = await fetch('http://localhost:3000/films/' + (1 + currentPage));
+    const content = await response.json();
+    movies = content.docs;
+    moviesNb = content.total;
+    pagesNb = content.pages;
     showPage()
 };
 
 function next() {
-    if(currentPage < pagesNb - 1)
-    currentPage++
+    if (currentPage < pagesNb - 1)
+        currentPage++
+    fetchFilmFromAPI()
     showPage(movies, currentPage)
     document.querySelector('#pageNb').innerHTML = `Page ${currentPage + 1}`;
 }
 
 function prev() {
-    if(currentPage > 0)
-    currentPage--
+    if (currentPage > 0)
+        currentPage--
+    fetchFilmFromAPI()
     showPage(movies, currentPage)
     document.querySelector('#pageNb').innerHTML = `Page ${currentPage + 1}`;
 }
 
 const showPage = () => {
-    const moviesOfPage = movies.slice(currentPage * pageLength, currentPage * pageLength + pageLength)
-    document.querySelector('.row').innerHTML = moviesOfPage.map(movies => runderFilm(movies)).join('');
+    document.querySelector('.row').innerHTML = movies.map(movies => runderFilm(movies)).join('');
 }
 
 fetchFilmFromAPI();
+
+async function deleteMovie(id) {
+    await fetch('http://localhost:3000/film/' + id, {
+        method: 'DELETE'
+    });
+    fetchFilmFromAPI()
+}
